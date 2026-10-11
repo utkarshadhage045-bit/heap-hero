@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heap Hero — DSA Game</title>
+<style>
+:root{--bg:#0b1020;--panel:#141c32;--panel2:#1b2743;--text:#eef3ff;--muted:#9eaccb;--cyan:#4de1e8;--purple:#a78bfa;--green:#52e0a0;--red:#ff7185;--gold:#ffd166}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 15% 0%,#1a2850 0,transparent 35%),radial-gradient(circle at 90% 20%,#30204d 0,transparent 30%),var(--bg);min-height:100vh}
+header{padding:24px 5vw 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:1px solid #ffffff12}
+.brand{display:flex;gap:13px;align-items:center}.logo{height:48px;width:48px;border-radius:15px;display:grid;place-items:center;font-size:26px;background:linear-gradient(135deg,var(--cyan),var(--purple));box-shadow:0 8px 30px #4de1e833}
+h1{font-size:clamp(24px,4vw,36px);margin:0;letter-spacing:-1px}h1 span{color:var(--cyan)}.subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#ffffff0b;border:1px solid #ffffff14;padding:10px 15px;border-radius:13px;min-width:90px}.stat small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}.stat strong{font-size:19px}
+main{width:min(1200px,92vw);margin:25px auto 45px}.intro{display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;margin-bottom:18px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.intro h2{font-size:clamp(23px,3vw,31px);margin:5px 0}.intro p{color:var(--muted);margin:0;max-width:620px;line-height:1.5}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:18px}.card{background:linear-gradient(150deg,#18223b,#11182b);border:1px solid #ffffff13;border-radius:20px;padding:20px;box-shadow:0 15px 45px #0002}.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px}.card h3{margin:0;font-size:17px}.pill{font-size:11px;border:1px solid #4de1e855;color:var(--cyan);background:#4de1e811;padding:6px 9px;border-radius:30px;font-weight:700}
+select,input{background:#0b1224;color:var(--text);border:1px solid #ffffff20;border-radius:10px;padding:11px 12px;outline:none;min-width:0}select:focus,input:focus{border-color:var(--cyan)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;color:var(--muted)}.field.full{grid-column:1/-1}
+button{border:0;border-radius:11px;padding:11px 13px;font-weight:800;cursor:pointer;transition:transform .15s,filter .15s;font-size:13px}button:hover{filter:brightness(1.1);transform:translateY(-1px)}button:active{transform:translateY(0)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}.primary{background:linear-gradient(100deg,var(--cyan),#91f4d2);color:#07111e}.secondary{background:#ffffff12;color:var(--text);border:1px solid #ffffff16}.purple{background:linear-gradient(100deg,#a78bfa,#d4a6ff);color:#180d2a}.danger{background:#ff71851b;color:#ff9aa8;border:1px solid #ff718544}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.actions .wide{grid-column:1/-1}
+.heap-stage{min-height:310px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:15px;background:radial-gradient(ellipse at center,#25365c77,transparent 68%),#0a1122;border:1px solid #ffffff0b;padding:18px 6px}
+svg{width:100%;height:290px;overflow:visible}.edge{stroke:#62739b;stroke-width:2.5;opacity:.9}.node{fill:#1a3150;stroke:#4de1e8;stroke-width:2.2}.node-text{fill:#f2f7ff;font-size:15px;font-weight:800;text-anchor:middle;dominant-baseline:central}.node.active{fill:#5b3da3;stroke:#d2b8ff;filter:drop-shadow(0 0 8px #a78bfa88)}.node.violating{fill:#582737;stroke:var(--red)}.empty{text-align:center;color:var(--muted);padding:40px 15px}
+.array-title{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12px;margin:16px 0 9px}.array-view{display:flex;gap:7px;flex-wrap:wrap;min-height:43px}.cell{min-width:40px;height:42px;border:1px solid #4de1e866;background:#152742;border-radius:9px;display:grid;place-items:center;font-weight:800;color:var(--cyan);position:relative}.cell small{position:absolute;bottom:-15px;font-size:9px;color:var(--muted);font-weight:500}.array-view{padding-bottom:17px}
+.message{margin-top:13px;border:1px solid #ffffff12;background:#ffffff07;border-radius:12px;padding:12px 13px;color:var(--muted);font-size:13px;line-height:1.5;min-height:44px}.message.good{border-color:#52e0a055;color:#a7f4d0}.message.bad{border-color:#ff718555;color:#ffb0bb}
+.side-stack{display:grid;gap:18px;align-content:start}.quick-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}.quick-buttons button{font-size:12px}.rule{display:flex;gap:10px;margin-top:13px;align-items:flex-start}.rule-icon{flex:none;height:28px;width:28px;border-radius:9px;background:#4de1e815;color:var(--cyan);display:grid;place-items:center;font-weight:900}.rule strong{font-size:13px;display:block;margin:1px 0 3px}.rule p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.progress-track{height:7px;background:#ffffff12;border-radius:9px;overflow:hidden;margin:11px 0}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width .25s}
+.challenge{padding:15px;border-radius:14px;background:linear-gradient(135deg,#25254c,#172744);border:1px solid #a78bfa33}.challenge .label{font-size:10px;letter-spacing:1.5px;color:#c5b3ff;font-weight:900}.challenge h4{margin:7px 0;font-size:16px}.challenge p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}.footer{text-align:center;color:#7180a2;font-size:12px;margin-top:24px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.heap-stage{min-height:260px}.card{padding:16px}.stats{width:100%}.stat{flex:1}}
+@media(max-width:430px){header{padding:18px 4vw}.stats .stat{min-width:0;padding:8px 10px}.controls{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{grid-template-columns:1fr 1fr}.heap-stage{padding:10px 0}svg{height:250px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">♜</div><div><h1>HEAP <span>HERO</span></h1><div class="subtitle">A hands-on Data Structures game</div></div></div>
+  <div class="stats">
+    <div class="stat"><small>Score</small><strong id="score">0</strong></div>
+    <div class="stat"><small>Moves</small><strong id="moves">0</strong></div>
+    <div class="stat"><small>Level</small><strong id="level">1</strong></div>
+  </div>
+</header>
+<main>
+  <section class="intro"><div><div class="eyebrow">DSA GAME / 09</div><h2>Build it. Balance it. Beat the heap.</h2><p>Practice Min Heap and Max Heap operations with a live tree. Make smart moves, keep the heap property, and earn XP.</p></div></section>
+  <div class="layout">
+    <section class="card">
+      <div class="card-head"><h3>Heap Visualizer</h3><span class="pill" id="propertyPill">MIN HEAP</span></div>
+      <div class="heap-stage" id="heapStage"><svg id="heapSvg" viewBox="0 0 700 300" role="img" aria-label="Heap tree visualization"></svg></div>
+      <div class="array-title"><span>ARRAY REPRESENTATION</span><span id="arrayCount">0 elements</span></div>
+      <div class="array-view" id="arrayView"></div>
+      <div class="message" id="message" aria-live="polite">Choose a heap type and insert a number to begin your quest.</div>
+    </section>
+    <aside class="side-stack">
+      <section class="card">
+        <div class="card-head"><h3>Control Panel</h3><span class="pill">PLAY MODE</span></div>
+        <div class="controls">
+          <div class="field"><label for="heapType">Heap Type</label><select id="heapType"><option value="min">Min Heap</option><option value="max">Max Heap</option></select></div>
+          <div class="field"><label for="levelSelect">Difficulty</label><select id="levelSelect"><option value="1">Level 1 · Rookie</option><option value="2">Level 2 · Builder</option><option value="3">Level 3 · Master</option></select></div>
+          <div class="field full"><label for="numberInput">Enter a value (0–99)</label><input id="numberInput" type="number" min="0" max="99" placeholder="e.g. 42" inputmode="numeric"></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="insertBtn">＋ Insert</button>
+          <button class="purple" id="extractBtn">↧ Extract Root</button>
+          <button class="secondary" id="peekBtn">◎ Peek Root</button>
+          <button class="secondary" id="heapifyBtn">⇅ Heapify Random</button>
+          <button class="secondary wide" id="randomBtn">✦ Generate Random Heap</button>
+          <button class="danger wide" id="resetBtn">↺ Reset Game</button>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h3>Current Challenge</h3><span class="pill" id="challengeBadge">+50 XP</span></div>
+        <div class="challenge"><div class="label">YOUR MISSION</div><h4 id="challengeTitle">Build a 5-node heap</h4><p id="challengeText">Insert 5 values while keeping the heap property correct. You can change the values as you like.</p></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px"><span>Challenge progress</span><span id="progressText">0 / 5 nodes</span></div>
+      </section>
+      <section class="card">
+        <div class="card-head"><h3>Heap Rules</h3></div>
+        <div class="rule"><div class="rule-icon">↓</div><div><strong>Min Heap</strong><p>Every parent is less than or equal to its children. The smallest value sits at the root.</p></div></div>
+        <div class="rule"><div class="rule-icon">↑</div><div><strong>Max Heap</strong><p>Every parent is greater than or equal to its children. The largest value sits at the root.</p></div></div>
+        <div class="rule"><div class="rule-icon">⌘</div><div><strong>Array indexes</strong><p>For a node at index i: left child = 2i + 1, right child = 2i + 2, parent = floor((i − 1) / 2).</p></div></div>
+      </section>
+    </aside>
+  </div>
+  <div class="footer">HEAP HERO • Learn algorithms by playing • Progress is stored only for this session</div>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let heap = [], score = 0, moves = 0, challengeComplete = false;
+  const maxSizeByLevel = {1:7, 2:15, 3:31};
+  const targetByLevel = {1:5, 2:8, 3:12};
+  const type = () => $('heapType').value;
+  const isHigher = (a,b) => type() === 'min' ? a < b : a > b;
+  const validValue = () => {
+    const raw = $('numberInput').value;
+    if (raw.trim() === '') { say('Enter a number between 0 and 99 first.', 'bad'); return null; }
+    const n = Number(raw);
+    if (!Number.isInteger(n) || n < 0 || n > 99) { say('Only whole numbers from 0 to 99 are allowed.', 'bad'); return null; }
+    return n;
+  };
+  function say(text, kind='') { $('message').textContent = text; $('message').className = 'message' + (kind ? ' '+kind : ''); }
+  function swap(i,j) { [heap[i],heap[j]] = [heap[j],heap[i]]; }
+  function siftUp(i) {
+    while (i > 0) { const p = Math.floor((i-1)/2); if (!isHigher(heap[i],heap[p])) break; swap(i,p); i=p; }
+  }
+  function siftDown(i) {
+    while (true) {
+      let best=i, l=2*i+1, r=2*i+2;
+      if (l<heap.length && isHigher(heap[l],heap[best])) best=l;
+      if (r<heap.length && isHigher(heap[r],heap[best])) best=r;
+      if (best===i) break; swap(i,best); i=best;
+    }
+  }
+  function buildHeap(values) { heap = values.slice(); for(let i=Math.floor(heap.length/2)-1;i>=0;i--) siftDown(i); }
+  function updateStats() {
+    $('score').textContent = score; $('moves').textContent = moves;
+    $('level').textContent = $('levelSelect').value;
+    $('propertyPill').textContent = type().toUpperCase()+' HEAP';
+    $('arrayCount').textContent = heap.length+' element'+(heap.length===1?'':'s');
+    const target = targetByLevel[$('levelSelect').value];
+    const progress = Math.min(heap.length,target);
+    $('progressFill').style.width = (progress/target*100)+'%';
+    $('progressText').textContent = progress+' / '+target+' nodes';
+    $('challengeTitle').textContent = 'Build a '+target+'-node heap';
+    $('challengeText').textContent = heap.length>=target ? 'Mission complete! Try extracting the root, or switch difficulty for a bigger challenge.' : 'Insert '+(target-heap.length)+' more value'+(target-heap.length===1?'':'s')+' while keeping the heap property correct.';
+    $('challengeBadge').textContent = challengeComplete ? '✓ COMPLETED' : '+'+(target*10)+' XP';
+    if(heap.length>=target && !challengeComplete) { challengeComplete=true; score+=target*10; $('score').textContent=score; $('challengeBadge').textContent='✓ COMPLETED'; say('Challenge completed! +'+(target*10)+' bonus points. Keep going, Hero!','good'); }
+    if(heap.length<target) challengeComplete=false;
+  }
+  function render() {
+    const svg=$('heapSvg'); svg.innerHTML='';
+    const W=700,H=300, top=27, bottom=H-27;
+    if(!heap.length) {
+      svg.innerHTML='<text x="350" y="145" fill="#9eaccb" font-size="16" text-anchor="middle">Your heap is waiting, Hero!</text><text x="350" y="171" fill="#66789f" font-size="12" text-anchor="middle">Insert a value to create the root node</text>';
+    } else {
+      const depth=Math.floor(Math.log2(heap.length))+1;
+      const levelGap=Math.min(68,(bottom-top)/(Math.max(1,depth-1)));
+      const positions=[];
+      for(let i=0;i<heap.length;i++){
+        const level=Math.floor(Math.log2(i+1)), first=(1<<level)-1, offset=i-first, count=1<<level;
+        positions.push({x:W*(offset+0.5)/count,y:top+level*levelGap});
+      }
+      for(let i=1;i<heap.length;i++){
+        const p=Math.floor((i-1)/2), a=positions[p], b=positions[i];
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',a.x);line.setAttribute('y1',a.y+17);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y-17);line.setAttribute('class','edge');svg.appendChild(line);
+      }
+      heap.forEach((v,i)=>{
+        const pos=positions[i], g=document.createElementNS('http://www.w3.org/2000/svg','g');
+        const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx',pos.x);c.setAttribute('cy',pos.y);c.setAttribute('r',17);c.setAttribute('class','node'+(i===0?' active':''));
+        const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',pos.x);t.setAttribute('y',pos.y+1);t.setAttribute('class','node-text');t.textContent=v;
+        g.appendChild(c);g.appendChild(t);svg.appendChild(g);
+      });
+    }
+    $('arrayView').innerHTML='';
+    heap.forEach((v,i)=>{const cell=document.createElement('div');cell.className='cell';cell.textContent=v;const small=document.createElement('small');small.textContent='idx '+i;cell.appendChild(small);$('arrayView').appendChild(cell);});
+    updateStats();
+  }
+  function insert() {
+    const n=validValue(); if(n===null)return;
+    if(heap.length>=maxSizeByLevel[$('levelSelect').value]) {say('Heap is full for this difficulty. Increase the level or extract a value.','bad');return;}
+    heap.push(n);siftUp(heap.length-1);score+=10;moves++;render();say('Inserted '+n+' and restored the '+type()+' heap property. +10 points!','good');$('numberInput').value='';
+  }
+  function extract() {
+    if(!heap.length){say('Heap underflow: there is no root to extract.','bad');return;}
+    const root=heap[0];const last=heap.pop();if(heap.length){heap[0]=last;siftDown(0);}
+    score+=15;moves++;render();say('Extracted root '+root+'. The heap was rebalanced. +15 points!','good');
+  }
+  function peek() {
+    if(!heap.length){say('The heap is empty. Insert a value first.','bad');return;}
+    say('Root value is '+heap[0]+(type()==='min'?' (the minimum).':' (the maximum).'),'good');
+  }
+  function randomHeap() {
+    const count=Math.min(targetByLevel[$('levelSelect').value],maxSizeByLevel[$('levelSelect').value]);
+    const values=Array.from({length:count},()=>Math.floor(Math.random()*90)+10);
+    buildHeap(values);moves++;score+=5;challengeComplete=false;render();say('Generated and heapified '+count+' random values. +5 points!','good');
+  }
+  function heapifyRandom() {
+    if(!heap.length){randomHeap();return;}
+    buildHeap(heap);moves++;score+=10;render();say('Heapify complete: the array now satisfies the '+type()+' heap property. +10 points!','good');
+  }
+  function reset() {heap=[];score=0;moves=0;challengeComplete=false;render();say('Game reset. Choose a heap type and start building!');}
+  $('insertBtn').addEventListener('click',insert);
+  $('extractBtn').addEventListener('click',extract);
+  $('peekBtn').addEventListener('click',peek);
+  $('heapifyBtn').addEventListener('click',heapifyRandom);
+  $('randomBtn').addEventListener('click',randomHeap);
+  $('resetBtn').addEventListener('click',reset);
+  $('numberInput').addEventListener('keydown',e=>{if(e.key==='Enter')insert();});
+  $('heapType').addEventListener('change',()=>{buildHeap(heap);challengeComplete=false;render();say('Switched to '+type().toUpperCase()+' HEAP. The tree has been rebalanced.','good');});
+  $('levelSelect').addEventListener('change',()=>{challengeComplete=false;render();say('Difficulty updated. Build your heap to complete the new challenge.');});
+  render();
+})();
+</script>
+</body>
+</html>
